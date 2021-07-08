@@ -42,37 +42,43 @@ import com.jjoe64.graphview.series.LineGraphSeries;
 import java.text.DecimalFormat;
 
 
-public class Accelerometer extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, SensorEventListener, View.OnClickListener
+public class Accelerometer extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, SensorEventListener
 {
     NavigationView navigationView;
 
-    //Sensor related declarations
+    //Infromation
     private TextView  Info_deg, Info_tone ;
+
+    // Sensor
     private Sensor accSensor, rotSensor;
-
     private SensorManager SM;
+
+    // Values
     private double lessFloatX;
-
-    // buttons
-    private Button buttonRecordValues;
-
-    //Graph related declarations
     private double yValueXaxis;
+    public long timestampbegin;
+
+    //Maximum finder
+    double x_lastvalue = 0;
+    public long  maxf_start;
+    double pseudoheading, pseudoheading_deg_whenStarted;
 
 
+    // VIEWS
+    // buttons
+    //private Button buttonRecordValues;
     private final Handler mHandler = new Handler();
     private Runnable mTimer;
     static GraphView graphX;
-
     static LineGraphSeries<DataPoint> seriesX;
-
     long activityCreateTime;
-
     LinearLayout llbase;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
+        // Setup Layout Views and Activity
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_accelerometer);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -90,13 +96,7 @@ public class Accelerometer extends AppCompatActivity implements NavigationView.O
         // Set the current activity as marked in the menu
         navigationView.setCheckedItem(R.id.menuAcc);
 
-        //Find so we can swap them
-
         llbase = (LinearLayout)findViewById(R.id.content_accelerometer) ;
-
-        // buttons
-        buttonRecordValues = (Button)findViewById((R.id.buttonRecordValues));
-        buttonRecordValues.setOnClickListener(this);
 
         //Create sensor manager
         SM = (SensorManager)getSystemService(SENSOR_SERVICE);
@@ -104,15 +104,8 @@ public class Accelerometer extends AppCompatActivity implements NavigationView.O
         accSensor = SM.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         rotSensor = SM.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR);
 
-        //Start Listening to sensor
-        //SM.registerListener(this,accSensor,SensorManager.SENSOR_DELAY_UI);
-        //SM.registerListener(this,rotSensor,SensorManager.SENSOR_DELAY_UI);
-
-        //Assign TextViews for accelerometer data
-        //XaxisText = (TextView)findViewById(R.id.XDataText);
         Info_deg = (TextView)findViewById(R.id.Info1);
         Info_tone = (TextView)findViewById(R.id.Info2);
-        //info = (TextView)findViewById(R.id.info);
 
 
         //Graph X
@@ -123,12 +116,9 @@ public class Accelerometer extends AppCompatActivity implements NavigationView.O
         graphX.getViewport().setXAxisBoundsManual(true);
         graphX.getViewport().setMinX(0);
         graphX.getViewport().setMaxX(10000);
-        //graphX.getViewport().setYAxisBoundsManual(true);
         graphX.getViewport().setMinY(-40);
         graphX.getViewport().setMaxY(40);
         graphX.getGridLabelRenderer().setNumHorizontalLabels(4);
-
-
 
 
         //X Axis Graph Label format
@@ -148,79 +138,99 @@ public class Accelerometer extends AppCompatActivity implements NavigationView.O
 
         activityCreateTime = System.currentTimeMillis();
 
-
     }
 
-    //Values
-    double xmin, xmax, ymin, ymax, zmin, zmax;
-    public long timestampbegin, lastxmax;
+    @Override
+    public void onResume(){
+        super.onResume();
 
-    //Maximum finder
-    double x_lastvalue = 0;
-    public long  maxf_start;
-    double pseudoheading, pseudoheading_deg_whenStarted;
+        navigationView.setCheckedItem(R.id.menuAcc);
 
-    //Button
+        // register Sensors
+        SM.registerListener(this,accSensor,SensorManager.SENSOR_DELAY_UI);
+        SM.registerListener(this,rotSensor,SensorManager.SENSOR_DELAY_UI);
 
-    public void onClick(View v) {
-        switch (v.getId()) {
-            case  R.id.buttonRecordValues: {
-                // reset timestamp
-                timestampbegin = System.currentTimeMillis();
-                break;
+        // Timer for plotting X-Axis acceleration
+        mTimer = new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                yValueXaxis = lessFloatX;
+                seriesX.appendData(newDatapoint(yValueXaxis), true, 100);
+                graphX.onDataChanged(true, false);
+                mHandler.postDelayed(this, 100);
             }
+        };
+        mHandler.postDelayed(mTimer, 100);
+    }
+
+    @Override
+    public void onPause(){
+        super.onPause(); //always call superclass method first
+
+        mHandler.removeCallbacks(mTimer);
+
+        SM.unregisterListener(this,accSensor);
+        SM.unregisterListener(this,rotSensor);
+    }
+
+    @Override
+    public void onSensorChanged(SensorEvent sensorEvent) {
+
+        // acceleration
+        if (sensorEvent.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
+            lessFloatX = round(sensorEvent.values[0], 1);
+
+            collectData(sensorEvent.values);
+        }
+        // heading
+        if (sensorEvent.sensor.getType() == Sensor.TYPE_ROTATION_VECTOR) {
+            double valuePsHead = sensorEvent.values[1];
+            pseudoheading = round(valuePsHead * 266.26, 1);
+            Info_deg.setText(String.valueOf((pseudoheading) + "°"));
+
+            ChangeColor();
         }
     }
 
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int i) {
+        //Not in use
+    }
+    // plot point
+    private DataPoint newDatapoint(double y)
+    {
+        double timeSince = System.currentTimeMillis() - activityCreateTime;
+        return new DataPoint(timeSince, y);
+    }
 
 
+    // analyse acceleration data on X-Axis
     public void collectData(float[] values)
     {
-//        if(System.currentTimeMillis() < timestampbegin+500)
-//        {
-//            if(values[0] < xmin) xmin = values[0];
-//            if(values[0] > xmax) xmax = values[0];
-//            if(values[1] < ymin) ymin = values[1];
-//            if(values[1] > ymax) ymax = values[1];
-//            if(values[2] < zmin) zmin = values[2];
-//            if(values[2] > zmax) zmax = values[2];
-//            if(values[0] < xmin*0.9)
-//            {
-//                info.setText("searching");
-//            }
-//        }
-//        else
-//        {
-//            collectScan(values);
-//        }
-//        if(System.currentTimeMillis() > timestampbegin+500 && System.currentTimeMillis() < timestampbegin+600) {
-//            info.setText("finished");
-//        }
-
-        // if going up, but still below -2m/s2
+        // if going up, but still below a * m/s2
         if(values[0] < -0 && values[0] > x_lastvalue)
         {
             maxf_start = System.currentTimeMillis();
             pseudoheading_deg_whenStarted = pseudoheading;
         }
 
-        //within the frame, more than 20mss and direction changed
+        //within the frame, more than a*m/s2 and direction changed
         if(System.currentTimeMillis() < maxf_start + 300)
         {
-            if(values[0] > 15 && values[0] < x_lastvalue)
+            if(values[0] > 12 && values[0] < x_lastvalue)
             {
                 // Triggerd
                 maxf_start = 0;
                 playTone();
             }
         }
-
         x_lastvalue = values[0];
     }
 
 
-
-
+    // play tone acording to heading
     public void playTone(){
         int resource;
         if(pseudoheading_deg_whenStarted < -131)
@@ -276,44 +286,69 @@ public class Accelerometer extends AppCompatActivity implements NavigationView.O
         });
     }
 
+    // Change color according to heading
+    private void ChangeColor()
+    {
+        if(pseudoheading < -131)
+        {
+            llbase.setBackgroundColor((0xFFffaf7a));
+            Info_tone.setText("C³");
+        }
+        else
+        {
+            if (pseudoheading < -82 )
+            {
+                llbase.setBackgroundColor((0xFFff9d5c));
+                Info_tone.setText("D³");
+            }
+            else {
+                if (pseudoheading < -33)
+                {
+                    llbase.setBackgroundColor((0xFFff8b3d));
+                    Info_tone.setText("D#³");
+                }
+                else
+                {
+                    if (pseudoheading < 24 )
+                    {
+                        llbase.setBackgroundColor((0xFFff781f));
+                        Info_tone.setText("E³");
+                    }
+                    else
+                    {
+                        if (pseudoheading < 75)
+                        {
+                            llbase.setBackgroundColor((0xFFff6600));
+                            Info_tone.setText("F³");
+                        }
+                        else
+                        {
+                            if (pseudoheading < 126)
+                            {
+                                llbase.setBackgroundColor((0xFFe15f1a));
+                                Info_tone.setText("F#³");
+                            } else
+                            {
+                                llbase.setBackgroundColor((0xFFc85417));
+                                Info_tone.setText("G³");
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+
+
+    // ##########################################
+    // Overhead
+
     public void onRestoreInstanceState(Bundle savedInstanceState)
     {
         super.onRestoreInstanceState(savedInstanceState);
 
         navigationView.setCheckedItem(R.id.menuAcc);
-    }
-    @Override
-    public void onPause(){
-        super.onPause(); //always call superclass method first
-
-            mHandler.removeCallbacks(mTimer);
-
-            SM.unregisterListener(this,accSensor);
-            SM.unregisterListener(this,rotSensor);
-
-    }
-    @Override
-    public void onResume(){
-        super.onResume();
-
-        navigationView.setCheckedItem(R.id.menuAcc);
-
-        SM.registerListener(this,accSensor,SensorManager.SENSOR_DELAY_UI);
-        SM.registerListener(this,rotSensor,SensorManager.SENSOR_DELAY_UI);
-
-
-        mTimer = new Runnable()
-        {
-            @Override
-            public void run()
-            {
-                yValueXaxis = lessFloatX;
-                seriesX.appendData(newDatapoint(yValueXaxis), true, 100);
-                graphX.onDataChanged(true, false);
-                mHandler.postDelayed(this, 100);
-            }
-        };
-        mHandler.postDelayed(mTimer, 100);
     }
 
     @Override
@@ -416,93 +451,5 @@ public class Accelerometer extends AppCompatActivity implements NavigationView.O
         int scale = (int) Math.pow(10, precision);
         return (double) Math.round(value * scale) / scale;
     }
-
-    @Override
-    public void onSensorChanged(SensorEvent sensorEvent) {
-
-        if (sensorEvent.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
-            lessFloatX = round(sensorEvent.values[0], 1);
-
-            collectData(sensorEvent.values);
-        }
-        if (sensorEvent.sensor.getType() == Sensor.TYPE_ROTATION_VECTOR) {
-            //float rotationMatrix[];
-            //rotationMatrix=new float[16];
-            //SM.getRotationMatrixFromVector(rotationMatrix,sensorEvent.values);
-
-            double valuePsHead = sensorEvent.values[1];
-            pseudoheading = round(valuePsHead * 266.26, 1);
-            Info_deg.setText(String.valueOf((pseudoheading)));
-
-            ChangeColor();
-
-        }
-
-    }
-
-    private void ChangeColor()
-    {
-        if(pseudoheading < -131)
-        {
-            llbase.setBackgroundColor((0xFFffaf7a));
-            Info_tone.setText("C³");
-        }
-        else
-        {
-            if (pseudoheading < -82 )
-            {
-                llbase.setBackgroundColor((0xFFff9d5c));
-                Info_tone.setText("D³");
-            }
-            else {
-                if (pseudoheading < -33)
-                {
-                    llbase.setBackgroundColor((0xFFff8b3d));
-                    Info_tone.setText("D#³");
-                }
-                else
-                {
-                    if (pseudoheading < 24 )
-                    {
-                        llbase.setBackgroundColor((0xFFff781f));
-                        Info_tone.setText("E³");
-                    }
-                    else
-                    {
-                        if (pseudoheading < 75)
-                        {
-                            llbase.setBackgroundColor((0xFFff6600));
-                            Info_tone.setText("F³");
-                        }
-                        else
-                        {
-                            if (pseudoheading < 126)
-                            {
-                                llbase.setBackgroundColor((0xFFe15f1a));
-                                Info_tone.setText("F#³");
-                            } else
-                            {
-                                llbase.setBackgroundColor((0xFFc85417));
-                                Info_tone.setText("G³");
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-
-    }
-
-    @Override
-    public void onAccuracyChanged(Sensor sensor, int i) {
-        //Not in use
-    }
-    private DataPoint newDatapoint(double y)
-    {
-        double timeSince = System.currentTimeMillis() - activityCreateTime;
-        return new DataPoint(timeSince, y);
-    }
-
-    }
+}
 

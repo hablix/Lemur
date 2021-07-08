@@ -35,7 +35,8 @@
         <!-- android:visible="false" -->
         <item
             android:id="@+id/menuVision"
-            android:title="Vision"/>
+            android:title="Vision"
+            android:visible="false"/>
     </group>
 
     <group
@@ -44,10 +45,12 @@
 
         <item
             android:id="@+id/menuHelp"
-            android:title="Help"/>
+            android:title="Help"
+            android:visible="false"/>
         <item
             android:id="@+id/menuSettings"
-            android:title="Settings"/>
+            android:title="Settings"
+            android:visible="false"/>
     </group>
 
 </menu>
