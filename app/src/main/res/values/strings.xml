@@ -8,7 +8,7 @@
     <string name="title_activity_vision">Vision</string>
     <string name="title_activity_decibel">Decibel</string>
     <string name="title_activity_altimeter">Altimeter</string>
-    <string name="title_activity_accelerometer">Accelerometer</string>
+    <string name="title_activity_accelerometer">Röhrenglocken Simulator</string>
     <string name="title_activity_help">Help</string>
     <string name="title_activity_settings">Settings</string>
 

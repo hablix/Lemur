@@ -6,6 +6,7 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.NavigationView;
@@ -19,7 +20,10 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.g10.lemur.Altimeter.Altimeter;
@@ -37,42 +41,34 @@ import com.jjoe64.graphview.series.LineGraphSeries;
 
 import java.text.DecimalFormat;
 
-import static com.g10.lemur.R.id.YGraph;
-import static com.g10.lemur.R.id.ZGraph;
 
-public class Accelerometer extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, SensorEventListener
+public class Accelerometer extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, SensorEventListener, View.OnClickListener
 {
     NavigationView navigationView;
 
-    //To be able to Swap
-    private ImageView xDirectionIcon, yDirectionIcon, zDirectionIcon;
-    private CardView xGraphCard, yGraphCard, zGraphCard;
-    private ImageView xSwapper, ySwapper, zSwapper;
-    private TextView titleText;
-    private Drawable iconX, iconY,iconZ, iconXpressed, iconYpressed, iconZpressed;
-
     //Sensor related declarations
-    private TextView XaxisText, YaxisText, ZaxisText;
-    private Sensor accSensor;
+    private TextView  Info_deg, Info_tone ;
+    private Sensor accSensor, rotSensor;
+
     private SensorManager SM;
     private double lessFloatX;
-    private double lessFloatY;
-    private double lessFloatZ;
+
+    // buttons
+    private Button buttonRecordValues;
 
     //Graph related declarations
     private double yValueXaxis;
-    private double yValueYaxis;
-    private double yValueZaxis;
+
 
     private final Handler mHandler = new Handler();
     private Runnable mTimer;
     static GraphView graphX;
-    static GraphView graphY;
-    static GraphView graphZ;
+
     static LineGraphSeries<DataPoint> seriesX;
-    static LineGraphSeries<DataPoint> seriesY;
-    static LineGraphSeries<DataPoint> seriesZ;
+
     long activityCreateTime;
+
+    LinearLayout llbase;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -95,35 +91,29 @@ public class Accelerometer extends AppCompatActivity implements NavigationView.O
         navigationView.setCheckedItem(R.id.menuAcc);
 
         //Find so we can swap them
-        iconX = ContextCompat.getDrawable(getApplicationContext(),R.drawable.x);
-        iconY = ContextCompat.getDrawable(getApplicationContext(),R.drawable.y);
-        iconZ = ContextCompat.getDrawable(getApplicationContext(),R.drawable.z);
-        iconXpressed = ContextCompat.getDrawable(getApplicationContext(),R.drawable.xpressed);
-        iconYpressed = ContextCompat.getDrawable(getApplicationContext(),R.drawable.ypressed);
-        iconZpressed = ContextCompat.getDrawable(getApplicationContext(),R.drawable.zpressed);
-        titleText = (TextView)findViewById(R.id.mtextViewXTitle);
-        xDirectionIcon = (ImageView)findViewById(R.id.XDirectionIcon);
-        yDirectionIcon = (ImageView)findViewById(R.id.YDirectionIcon);
-        zDirectionIcon = (ImageView)findViewById(R.id.ZDirectionIcon);
-        xGraphCard = (CardView)findViewById(R.id.cardviewXGraph);
-        yGraphCard = (CardView)findViewById(R.id.cardviewYGraph);
-        zGraphCard = (CardView)findViewById(R.id.cardviewZGraph);
-        xSwapper = (ImageView)findViewById(R.id.swapperX);
-        ySwapper = (ImageView)findViewById(R.id.swapperY);
-        zSwapper = (ImageView)findViewById(R.id.swapperZ);
+
+        llbase = (LinearLayout)findViewById(R.id.content_accelerometer) ;
+
+        // buttons
+        buttonRecordValues = (Button)findViewById((R.id.buttonRecordValues));
+        buttonRecordValues.setOnClickListener(this);
 
         //Create sensor manager
         SM = (SensorManager)getSystemService(SENSOR_SERVICE);
 
         accSensor = SM.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        rotSensor = SM.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR);
 
         //Start Listening to sensor
-        SM.registerListener(this,accSensor,SensorManager.SENSOR_DELAY_UI);
+        //SM.registerListener(this,accSensor,SensorManager.SENSOR_DELAY_UI);
+        //SM.registerListener(this,rotSensor,SensorManager.SENSOR_DELAY_UI);
 
         //Assign TextViews for accelerometer data
-        XaxisText = (TextView)findViewById(R.id.XDataText);
-        YaxisText = (TextView)findViewById(R.id.YDataText);
-        ZaxisText = (TextView)findViewById(R.id.ZDataText);
+        //XaxisText = (TextView)findViewById(R.id.XDataText);
+        Info_deg = (TextView)findViewById(R.id.Info1);
+        Info_tone = (TextView)findViewById(R.id.Info2);
+        //info = (TextView)findViewById(R.id.info);
+
 
         //Graph X
         graphX = (GraphView)findViewById(R.id.XGraph);
@@ -138,31 +128,7 @@ public class Accelerometer extends AppCompatActivity implements NavigationView.O
         graphX.getViewport().setMaxY(40);
         graphX.getGridLabelRenderer().setNumHorizontalLabels(4);
 
-        //Graph Y
-        graphY = (GraphView)findViewById(YGraph);
-        seriesY = new LineGraphSeries<>();
-        graphY.addSeries(seriesY);
 
-        graphY.getViewport().setXAxisBoundsManual(true);
-        graphY.getViewport().setMinX(0);
-        graphY.getViewport().setMaxX(10000);
-        //graphY.getViewport().setYAxisBoundsManual(true);
-        graphY.getViewport().setMinY(-40);
-        graphY.getViewport().setMaxY(40);
-        graphY.getGridLabelRenderer().setNumHorizontalLabels(4);
-
-        //Graph z
-        graphZ = (GraphView)findViewById(ZGraph);
-        seriesZ = new LineGraphSeries<>();
-        graphZ.addSeries(seriesZ);
-
-        graphZ.getViewport().setXAxisBoundsManual(true);
-        graphZ.getViewport().setMinX(0);
-        graphZ.getViewport().setMaxX(10000);
-        //graphZ.getViewport().setYAxisBoundsManual(true);
-        graphZ.getViewport().setMinY(-40);
-        graphZ.getViewport().setMaxY(40);
-        graphZ.getGridLabelRenderer().setNumHorizontalLabels(4);
 
 
         //X Axis Graph Label format
@@ -179,37 +145,135 @@ public class Accelerometer extends AppCompatActivity implements NavigationView.O
                 }
             }
         });
-        //y Axis Graph Label Format
-        graphY.getGridLabelRenderer().setLabelFormatter(new DefaultLabelFormatter()
-        {
-            @Override
-            public String formatLabel(double value, boolean isValueX)
-            {
-                if (isValueX) {
-                    DecimalFormat df = new DecimalFormat("#.#");
-                    return df.format(value/1000)+"s";
-                } else {
-                    return super.formatLabel(value, isValueX);
-                }
-            }
-        });
-        //z Axis Graph Format
-        graphZ.getGridLabelRenderer().setLabelFormatter(new DefaultLabelFormatter()
-        {
-            @Override
-            public String formatLabel(double value, boolean isValueX)
-            {
-                if (isValueX) {
-                    DecimalFormat df = new DecimalFormat("#.#");
-                    return df.format(value/1000)+"s";
-                } else {
-                    return super.formatLabel(value, isValueX);
-                }
-            }
-        });
 
-        xSwapper.setImageDrawable(iconXpressed);
         activityCreateTime = System.currentTimeMillis();
+
+
+    }
+
+    //Values
+    double xmin, xmax, ymin, ymax, zmin, zmax;
+    public long timestampbegin, lastxmax;
+
+    //Maximum finder
+    double x_lastvalue = 0;
+    public long  maxf_start;
+    double pseudoheading, pseudoheading_deg_whenStarted;
+
+    //Button
+
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case  R.id.buttonRecordValues: {
+                // reset timestamp
+                timestampbegin = System.currentTimeMillis();
+                break;
+            }
+        }
+    }
+
+
+
+    public void collectData(float[] values)
+    {
+//        if(System.currentTimeMillis() < timestampbegin+500)
+//        {
+//            if(values[0] < xmin) xmin = values[0];
+//            if(values[0] > xmax) xmax = values[0];
+//            if(values[1] < ymin) ymin = values[1];
+//            if(values[1] > ymax) ymax = values[1];
+//            if(values[2] < zmin) zmin = values[2];
+//            if(values[2] > zmax) zmax = values[2];
+//            if(values[0] < xmin*0.9)
+//            {
+//                info.setText("searching");
+//            }
+//        }
+//        else
+//        {
+//            collectScan(values);
+//        }
+//        if(System.currentTimeMillis() > timestampbegin+500 && System.currentTimeMillis() < timestampbegin+600) {
+//            info.setText("finished");
+//        }
+
+        // if going up, but still below -2m/s2
+        if(values[0] < -0 && values[0] > x_lastvalue)
+        {
+            maxf_start = System.currentTimeMillis();
+            pseudoheading_deg_whenStarted = pseudoheading;
+        }
+
+        //within the frame, more than 20mss and direction changed
+        if(System.currentTimeMillis() < maxf_start + 300)
+        {
+            if(values[0] > 15 && values[0] < x_lastvalue)
+            {
+                // Triggerd
+                maxf_start = 0;
+                playTone();
+            }
+        }
+
+        x_lastvalue = values[0];
+    }
+
+
+
+
+    public void playTone(){
+        int resource;
+        if(pseudoheading_deg_whenStarted < -131)
+        {
+            resource = R.raw.l0_c3_cut;
+        }
+        else
+        {
+            if (pseudoheading_deg_whenStarted < -82 )
+            {
+                resource = R.raw.l1_d3_cut;
+            }
+            else {
+                if (pseudoheading_deg_whenStarted < -33)
+                {
+                    resource = R.raw.l2_ds3_cut;
+                }
+                else
+                {
+                    if (pseudoheading_deg_whenStarted < 24 )
+                    {
+                        resource = R.raw.l3_e3_cut;
+                    }
+                    else
+                    {
+                        if (pseudoheading_deg_whenStarted < 75)
+                        {
+                            resource = R.raw.l4_f3_cut;
+                        }
+                        else
+                        {
+                            if (pseudoheading_deg_whenStarted < 126)
+                            {
+                                resource = R.raw.l5_fs3_cut;
+                            } else
+                            {
+                                resource = R.raw.l6_g3_cut;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        final MediaPlayer mp = MediaPlayer.create(this,resource);
+        mp.start();
+
+        mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            public void onCompletion(MediaPlayer mp) {
+                //mp.reset();
+                //mp.release();
+            }
+        });
     }
 
     public void onRestoreInstanceState(Bundle savedInstanceState)
@@ -225,6 +289,7 @@ public class Accelerometer extends AppCompatActivity implements NavigationView.O
             mHandler.removeCallbacks(mTimer);
 
             SM.unregisterListener(this,accSensor);
+            SM.unregisterListener(this,rotSensor);
 
     }
     @Override
@@ -234,6 +299,7 @@ public class Accelerometer extends AppCompatActivity implements NavigationView.O
         navigationView.setCheckedItem(R.id.menuAcc);
 
         SM.registerListener(this,accSensor,SensorManager.SENSOR_DELAY_UI);
+        SM.registerListener(this,rotSensor,SensorManager.SENSOR_DELAY_UI);
 
 
         mTimer = new Runnable()
@@ -242,14 +308,8 @@ public class Accelerometer extends AppCompatActivity implements NavigationView.O
             public void run()
             {
                 yValueXaxis = lessFloatX;
-                yValueYaxis = lessFloatY;
-                yValueZaxis = lessFloatZ;
                 seriesX.appendData(newDatapoint(yValueXaxis), true, 100);
-                seriesY.appendData(newDatapoint(yValueYaxis), true, 100);
-                seriesZ.appendData(newDatapoint(yValueZaxis), true, 100);
                 graphX.onDataChanged(true, false);
-                graphY.onDataChanged(true, false);
-                graphZ.onDataChanged(true, false);
                 mHandler.postDelayed(this, 100);
             }
         };
@@ -359,12 +419,79 @@ public class Accelerometer extends AppCompatActivity implements NavigationView.O
 
     @Override
     public void onSensorChanged(SensorEvent sensorEvent) {
-        lessFloatX = round(sensorEvent.values[0],1);
-        lessFloatY = round(sensorEvent.values[1],1);
-        lessFloatZ = round(sensorEvent.values[2],1);
-        XaxisText.setText(String.valueOf(lessFloatX));
-        YaxisText.setText(String.valueOf((lessFloatY)));
-        ZaxisText.setText(String.valueOf((lessFloatZ)));
+
+        if (sensorEvent.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
+            lessFloatX = round(sensorEvent.values[0], 1);
+
+            collectData(sensorEvent.values);
+        }
+        if (sensorEvent.sensor.getType() == Sensor.TYPE_ROTATION_VECTOR) {
+            //float rotationMatrix[];
+            //rotationMatrix=new float[16];
+            //SM.getRotationMatrixFromVector(rotationMatrix,sensorEvent.values);
+
+            double valuePsHead = sensorEvent.values[1];
+            pseudoheading = round(valuePsHead * 266.26, 1);
+            Info_deg.setText(String.valueOf((pseudoheading)));
+
+            ChangeColor();
+
+        }
+
+    }
+
+    private void ChangeColor()
+    {
+        if(pseudoheading < -131)
+        {
+            llbase.setBackgroundColor((0xFFffaf7a));
+            Info_tone.setText("C³");
+        }
+        else
+        {
+            if (pseudoheading < -82 )
+            {
+                llbase.setBackgroundColor((0xFFff9d5c));
+                Info_tone.setText("D³");
+            }
+            else {
+                if (pseudoheading < -33)
+                {
+                    llbase.setBackgroundColor((0xFFff8b3d));
+                    Info_tone.setText("D#³");
+                }
+                else
+                {
+                    if (pseudoheading < 24 )
+                    {
+                        llbase.setBackgroundColor((0xFFff781f));
+                        Info_tone.setText("E³");
+                    }
+                    else
+                    {
+                        if (pseudoheading < 75)
+                        {
+                            llbase.setBackgroundColor((0xFFff6600));
+                            Info_tone.setText("F³");
+                        }
+                        else
+                        {
+                            if (pseudoheading < 126)
+                            {
+                                llbase.setBackgroundColor((0xFFe15f1a));
+                                Info_tone.setText("F#³");
+                            } else
+                            {
+                                llbase.setBackgroundColor((0xFFc85417));
+                                Info_tone.setText("G³");
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+
     }
 
     @Override
@@ -376,62 +503,6 @@ public class Accelerometer extends AppCompatActivity implements NavigationView.O
         double timeSince = System.currentTimeMillis() - activityCreateTime;
         return new DataPoint(timeSince, y);
     }
-    public void SwapViews(View view){
-        if (view == xSwapper)
-        {
-            xSwapper.setImageDrawable(iconXpressed);
-            ySwapper.setImageDrawable(iconY);
-            zSwapper.setImageDrawable(iconZ);
 
-            titleText.setText(getResources().getString(R.string.squared_symbolX));
-            XaxisText.setVisibility(View.VISIBLE);
-            xDirectionIcon.setVisibility(View.VISIBLE);
-            xGraphCard.setVisibility(View.VISIBLE);
-
-            YaxisText.setVisibility(View.INVISIBLE);
-            yDirectionIcon.setVisibility(View.INVISIBLE);
-            yGraphCard.setVisibility(View.INVISIBLE);
-
-            ZaxisText.setVisibility(View.INVISIBLE);
-            zDirectionIcon.setVisibility(View.INVISIBLE);
-            zGraphCard.setVisibility(View.INVISIBLE);
-        }
-        else if(view == ySwapper)
-        {
-            xSwapper.setImageDrawable(iconX);
-            ySwapper.setImageDrawable(iconYpressed);
-            zSwapper.setImageDrawable(iconZ);
-            titleText.setText(getResources().getString(R.string.squared_symbolY));
-            XaxisText.setVisibility(View.INVISIBLE);
-            xDirectionIcon.setVisibility(View.INVISIBLE);
-            xGraphCard.setVisibility(View.INVISIBLE);
-
-            YaxisText.setVisibility(View.VISIBLE);
-            yDirectionIcon.setVisibility(View.VISIBLE);
-            yGraphCard.setVisibility(View.VISIBLE);
-
-            ZaxisText.setVisibility(View.INVISIBLE);
-            zDirectionIcon.setVisibility(View.INVISIBLE);
-            zGraphCard.setVisibility(View.INVISIBLE);
-        }
-        else if(view == zSwapper)
-        {
-            xSwapper.setImageDrawable(iconX);
-            ySwapper.setImageDrawable(iconY);
-            zSwapper.setImageDrawable(iconZpressed);
-
-            titleText.setText(getResources().getString(R.string.squared_symbolZ));
-            XaxisText.setVisibility(View.INVISIBLE);
-            xDirectionIcon.setVisibility(View.INVISIBLE);
-            xGraphCard.setVisibility(View.INVISIBLE);
-
-            YaxisText.setVisibility(View.INVISIBLE);
-            yDirectionIcon.setVisibility(View.INVISIBLE);
-            yGraphCard.setVisibility(View.INVISIBLE);
-
-            ZaxisText.setVisibility(View.VISIBLE);
-            zDirectionIcon.setVisibility(View.VISIBLE);
-            zGraphCard.setVisibility(View.VISIBLE);
-        }
     }
-}
+

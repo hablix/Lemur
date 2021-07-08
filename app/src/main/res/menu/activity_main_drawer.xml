@@ -22,7 +22,7 @@
 
         <item
             android:id="@+id/menuAcc"
-            android:title="Accelerometer"/>
+            android:title="Röhrenglocken"/>
         <item
             android:id="@+id/menuAlti"
             android:title="Altimeter"/>
