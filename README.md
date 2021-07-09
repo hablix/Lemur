@@ -122,7 +122,9 @@ in einer weiteren version könnten mehr Töne durch einführung einer virtuellen
 
 
 # Referenz
-Projektverzeichnis der Simulation auf Github:\
+Projektverzeichnis der Simulation auf Github, hier kann der Gesamte Quellcode eingesehen werden und auch reproduziert werden:
+
+
 [https://github.com/hablix/Lemur](https://github.com/hablix/Lemur)
 
 # Quellen 
