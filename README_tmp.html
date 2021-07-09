@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>README.md</title>
+<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+
+<style>
+/* https://github.com/microsoft/vscode/blob/master/extensions/markdown-language-features/media/markdown.css */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+body {
+	font-family: var(--vscode-markdown-font-family, -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif);
+	font-size: var(--vscode-markdown-font-size, 14px);
+	padding: 0 26px;
+	line-height: var(--vscode-markdown-line-height, 22px);
+	word-wrap: break-word;
+}
+
+#code-csp-warning {
+	position: fixed;
+	top: 0;
+	right: 0;
+	color: white;
+	margin: 16px;
+	text-align: center;
+	font-size: 12px;
+	font-family: sans-serif;
+	background-color:#444444;
+	cursor: pointer;
+	padding: 6px;
+	box-shadow: 1px 1px 1px rgba(0,0,0,.25);
+}
+
+#code-csp-warning:hover {
+	text-decoration: none;
+	background-color:#007acc;
+	box-shadow: 2px 2px 2px rgba(0,0,0,.25);
+}
+
+body.scrollBeyondLastLine {
+	margin-bottom: calc(100vh - 22px);
+}
+
+body.showEditorSelection .code-line {
+	position: relative;
+}
+
+body.showEditorSelection .code-active-line:before,
+body.showEditorSelection .code-line:hover:before {
+	content: "";
+	display: block;
+	position: absolute;
+	top: 0;
+	left: -12px;
+	height: 100%;
+}
+
+body.showEditorSelection li.code-active-line:before,
+body.showEditorSelection li.code-line:hover:before {
+	left: -30px;
+}
+
+.vscode-light.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.15);
+}
+
+.vscode-light.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.40);
+}
+
+.vscode-light.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-dark.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.4);
+}
+
+.vscode-dark.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.60);
+}
+
+.vscode-dark.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-high-contrast.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 160, 0, 0.7);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 160, 0, 1);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+img {
+	max-width: 100%;
+	max-height: 100%;
+}
+
+a {
+	text-decoration: none;
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+a:focus,
+input:focus,
+select:focus,
+textarea:focus {
+	outline: 1px solid -webkit-focus-ring-color;
+	outline-offset: -1px;
+}
+
+hr {
+	border: 0;
+	height: 2px;
+	border-bottom: 2px solid;
+}
+
+h1 {
+	padding-bottom: 0.3em;
+	line-height: 1.2;
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+}
+
+h1, h2, h3 {
+	font-weight: normal;
+}
+
+table {
+	border-collapse: collapse;
+}
+
+table > thead > tr > th {
+	text-align: left;
+	border-bottom: 1px solid;
+}
+
+table > thead > tr > th,
+table > thead > tr > td,
+table > tbody > tr > th,
+table > tbody > tr > td {
+	padding: 5px 10px;
+}
+
+table > tbody > tr + tr > td {
+	border-top: 1px solid;
+}
+
+blockquote {
+	margin: 0 7px 0 5px;
+	padding: 0 16px 0 10px;
+	border-left-width: 5px;
+	border-left-style: solid;
+}
+
+code {
+	font-family: Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
+	font-size: 1em;
+	line-height: 1.357em;
+}
+
+body.wordWrap pre {
+	white-space: pre-wrap;
+}
+
+pre:not(.hljs),
+pre.hljs code > div {
+	padding: 16px;
+	border-radius: 3px;
+	overflow: auto;
+}
+
+pre code {
+	color: var(--vscode-editor-foreground);
+	tab-size: 4;
+}
+
+/** Theming */
+
+.vscode-light pre {
+	background-color: rgba(220, 220, 220, 0.4);
+}
+
+.vscode-dark pre {
+	background-color: rgba(10, 10, 10, 0.4);
+}
+
+.vscode-high-contrast pre {
+	background-color: rgb(0, 0, 0);
+}
+
+.vscode-high-contrast h1 {
+	border-color: rgb(0, 0, 0);
+}
+
+.vscode-light table > thead > tr > th {
+	border-color: rgba(0, 0, 0, 0.69);
+}
+
+.vscode-dark table > thead > tr > th {
+	border-color: rgba(255, 255, 255, 0.69);
+}
+
+.vscode-light h1,
+.vscode-light hr,
+.vscode-light table > tbody > tr + tr > td {
+	border-color: rgba(0, 0, 0, 0.18);
+}
+
+.vscode-dark h1,
+.vscode-dark hr,
+.vscode-dark table > tbody > tr + tr > td {
+	border-color: rgba(255, 255, 255, 0.18);
+}
+
+</style>
+
+<style>
+/* Tomorrow Theme */
+/* http://jmblog.github.com/color-themes-for-google-code-highlightjs */
+/* Original theme - https://github.com/chriskempson/tomorrow-theme */
+
+/* Tomorrow Comment */
+.hljs-comment,
+.hljs-quote {
+	color: #8e908c;
+}
+
+/* Tomorrow Red */
+.hljs-variable,
+.hljs-template-variable,
+.hljs-tag,
+.hljs-name,
+.hljs-selector-id,
+.hljs-selector-class,
+.hljs-regexp,
+.hljs-deletion {
+	color: #c82829;
+}
+
+/* Tomorrow Orange */
+.hljs-number,
+.hljs-built_in,
+.hljs-builtin-name,
+.hljs-literal,
+.hljs-type,
+.hljs-params,
+.hljs-meta,
+.hljs-link {
+	color: #f5871f;
+}
+
+/* Tomorrow Yellow */
+.hljs-attribute {
+	color: #eab700;
+}
+
+/* Tomorrow Green */
+.hljs-string,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-addition {
+	color: #718c00;
+}
+
+/* Tomorrow Blue */
+.hljs-title,
+.hljs-section {
+	color: #4271ae;
+}
+
+/* Tomorrow Purple */
+.hljs-keyword,
+.hljs-selector-tag {
+	color: #8959a8;
+}
+
+.hljs {
+	display: block;
+	overflow-x: auto;
+	color: #4d4d4c;
+	padding: 0.5em;
+}
+
+.hljs-emphasis {
+	font-style: italic;
+}
+
+.hljs-strong {
+	font-weight: bold;
+}
+</style>
+
+<style>
+/*
+ * Markdown PDF CSS
+ */
+
+ body {
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif, "Meiryo";
+	padding: 0 12px;
+}
+
+pre {
+	background-color: #f8f8f8;
+	border: 1px solid #cccccc;
+	border-radius: 3px;
+	overflow-x: auto;
+	white-space: pre-wrap;
+	overflow-wrap: break-word;
+}
+
+pre:not(.hljs) {
+	padding: 23px;
+	line-height: 19px;
+}
+
+blockquote {
+	background: rgba(127, 127, 127, 0.1);
+	border-color: rgba(0, 122, 204, 0.5);
+}
+
+.emoji {
+	height: 1.4em;
+}
+
+code {
+	font-size: 14px;
+	line-height: 19px;
+}
+
+/* for inline code */
+:not(pre):not(.hljs) > code {
+	color: #C9AE75; /* Change the old color so it seems less like an error */
+	font-size: inherit;
+}
+
+/* Page Break : use <div class="page"/> to insert page break
+-------------------------------------------------------- */
+.page {
+	page-break-after: always;
+}
+
+</style>
+
+<script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
+</head>
+<body>
+  <script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: document.body.classList.contains('vscode-dark') || document.body.classList.contains('vscode-high-contrast')
+          ? 'dark'
+          : 'default'
+    });
+  </script>
+<h2 id="projektbericht-vl-virtuelle-realit%C3%A4t">Projektbericht VL Virtuelle Realität</h2>
+<p><em>Hannes Bischoff</em></p>
+<h4 id="inhaltsverzeichnis">Inhaltsverzeichnis</h4>
+<ul>
+<li>Motivation</li>
+<li>Technologie
+<ul>
+<li>Kernaufgaben
+<ul>
+<li>Erkennen des Anschlags</li>
+<li>Richtungserkennung</li>
+</ul>
+</li>
+<li>Sound</li>
+<li>Layout</li>
+</ul>
+</li>
+<li>Ausblick</li>
+<li>Referenz</li>
+<li>Quellen</li>
+<li>Bildnachweis</li>
+</ul>
+<h4 id="beleg">Beleg</h4>
+<h1 id="motivation">Motivation</h1>
+<p>Projektidee war Eine App für ein Android Smartphone zu entwickeln die Röhrenglocken abbildet.
+Das Instrument der Röhrenglocken gehört zu den Idiophonen wird seit Ende des 19. Jahrhunderts auch in Orchestern verwendet. Um es zu spielen schlägt der Schlagwerker mit einem kleinen hämmerchen gegen eines der Röhren. Diese sind so aufgehangen das diese frei schwingen können und dabei klingen. Die meisten Röhrenglocken bestehen a 8, 12 oder 20 Röhren.
+Ziel diese Projektes ist es eine einfache, günstige Simulation dieses Spielverhaltens zu erzeugen. Die Verschiedenen Sensoren sollen dabei als Trigger dienen. Imitiert man mit dem Smartphone einen schlag, so soll analog zum anschlag mit dem hammer ein Ton erklingen. Wird eine andere röhre angeschlagen ändert sich die Tonhöhe, auch das soll abgebildet werden die wird so gelöst das abhängig von der richtung in der das smartphone beim Schlag gehalten wird sich die Tonhöhe ändert.</p>
+<p>Ein Schlagwerker an den Röhrenglocken 1917 <a href="https://de.wikipedia.org/wiki/R%C3%B6hrenglocken">https://de.wikipedia.org/wiki/R%C3%B6hrenglocken
+</a></p>
+<p><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a5/Chimes_%28IMSO_pp55%29.jpg/255px-Chimes_%28IMSO_pp55%29.jpg" alt="image"></p>
+<h1 id="technologie">Technologie</h1>
+<h2 id="grundlagen">Grundlagen</h2>
+<p>Zentrales element der Simulation ist das Smartphone. Dank seiner kompakten größe, handlichkeit und der eingebauten sensorik lässt es sich vielseitig verwenden und ist hierfür ideal geeignet. Außerdem ist keine Anschaffung spezieller hardware nötig wenn man handelsübliches Android smartphone besitzt.</p>
+<p>Die Wahl fiel auf die Android Plattform, da diese im kern ein open source source betriebssystem ist und es unzählig freie software und tools für die entwicklung von apps gibt.</p>
+<p>Der Programmcode dieses Projektes ist in Java geschrieben nutzt die als Entwicklungsumgebung wurde das freie Android studio mit den dazugehörigen Android developer kits genutzt welche federführend google entwickelt werden. Layoutdateien und design des projektes sind android typisch in xml.</p>
+<p>Um die Notwendigen und recht umfangreichen Vorarbeiten einer Android app zu verkürzen habe ich auf ein bereits existierendes projekt mit offenem Quellcode zur auswertung der verschiedene sensoren zurückgegriffen. Das Projekt Lemur auf github, shien dafür ideal geeignet zu sein. Es bedarf natürlich einiger anpassungen aber verkürzte die Arbeitsaufwand immens. Layout, grundeinstellungen, App interne navigation und berechtigungen systemseitig anzufragen können mitunter bei einer app die von grund auf neu entwickelt wird mehrere Tage arbeitsaufwand bedeuten bevor dass auch nur eine Zeile des gewünschten Algorithmuses geschrieben werden kann.</p>
+<h2 id="kernaufgaben">Kernaufgaben</h2>
+<p>Von allem überbau jeglicher Android projekte abgesehen lassen sich zwei Schwerpunkte herauskristallisieren.</p>
+<p>Das verwendete basis projekt liest diverse sensorwerte über die systemschnittstellen aus und kann diese grafisch anschaulich plotten.</p>
+<p>Die grafische darstellung der werte ist besonders nützlich um Charakteristik und Wertebereich eines ereignisses zu erkennen.</p>
+<p>Die meisten heutzutage verkauften Smartphones verfügen über mehrere eingebaute Bewegungs sensoren. In der Android Entwicklerdokumentation https://developer.android.com/guide/topics/sensors/sensors_motion sind diese beschrieben. Einige sensoren liefern physikalische messwerte wie z.B. Beschleunigungssensor und gyroskop. Andere sensoren existiere nur virtuell. der Rotationsvektor oder schrittzähler sind software implementierungen und nutzen die daten der anderen Sensoren und kombinieren diese und vorverarbeiten die daten.</p>
+<p><img src="https://raw.githubusercontent.com/hablix/Lemur/master/grafiken/Folie1.PNG" alt="image"></p>
+<h3 id="1-erkennen-des-anschlags">1. Erkennen des Anschlags</h3>
+<p>Dazu wird das telefon in einer kippbewegung um die Z-Achse bzw in der von der Y und X Achsen aufgespannten display ebene nach links bewegt. Dieses ereignis kann mit den im Smartphone eingebauten Beschleunigungssensoren erfasst werden. Der sensor liefert werte für Beschleunigung in der X,Y, und Z achse. Um die Ausgelesenen werte zu validieren genügt ein simpler test. steht das Gerät senkrecht auf mit der unterkante auf einem tisch und wird nicht bewegt liefert der sensor im idealfall für die Y achse 9,8m/s² entsprechend der lokalen erdbeschleunigung und die sensoren für die X und Z achse je 0 m/s².</p>
+<p>Dokumentation Beschleunigungssensor:</p>
+<p><img src="https://raw.githubusercontent.com/hablix/Lemur/master/grafiken/Folie2.PNG" alt="image"></p>
+<p>Graphisch ist der Ausschlag sehr gut zu sehen. Im nächsten schritt muss eine geeignete methode entwickelt und im Algorithmus umgesetzt werden um aus der Zeitreihe das Muster zuverlässig zu erkennen. Das vom sensor gelieferte Signal ist Zeitdiskret mit konstanter abtastzeit und wertdiskret. Die Quantisierungsschritte aber sehr klein als fließkommazahl im Java datentyp double.</p>
+<p>Als praktikabel und zuverlässig hat sich folgende Methode herausgestellt.</p>
+<p>Der Signalwert der X-Achse wird bei jeder iteration mit dem wert der vorherigen iteration verglichen. Wenn der aktuelle größer ist, also die werte ansteigen, und dennoch unterhalb der unteren schranke liegen. wird trigger 1 ausgelöst. Dieser trigger öffnet in 300ms langes zeitfenster (grün). Wird trigger 1 mehrfach ausgelöst spielt das keine rolle, dieser überschreibt den vorherigen. Der Trigger 1 ist notwendig aber noch nicht hinreichend um den Anschlag zu erkennen. Im geöffneten zeitfenster, wird das signal nun auf eine fallende Flanke untersucht. sobald das signal fällt also der vorherige signalwert größer als der aktuelle ist und sich die werte oberhalb der oberen schranke befinden wird dies als Maximum detektiert. Die festlegung der Schranken dienen dazu sehr kleine ausschläge zu ignorieren.</p>
+<p><img src="https://raw.githubusercontent.com/hablix/Lemur/master/grafiken/Folie3.PNG" alt="image"></p>
+<h3 id="2-richtungserkennung">2. Richtungserkennung</h3>
+<p>Mithilfe des virtuellen Richtungsvektor sensors ist eine Bestimmung der orientierung des Gerätes im raum möglich. Wird das smartphone gedreht und verharrt dann in dieser position wird dies trotzdem erkannt und es wird eine angegeben in welchem winkel sich das smartphone befindet. Relativ zur angenommenen erdoberfläche und der magnetischen orientierung. Der software sensor bezieht daten aus verschiedenen quellen wie: Beschleunigungsmesser, Magnetfelddetektor und Gyroskop. Fehlt einer dieser sensoren am Gerät, fällt die genauigkeit der werte dementsprechend deutlich schlechter aus.</p>
+<p>Für sie simulation wird die X-Z-Ebene in 7 gleich große Felder zu je 51,4° eingeteilt die jeweils einen ton repräsentieren. Je nachdem welchen winkel der Sensor für die drehung um die Y-Achse liefert wird der ton gespielt.</p>
+<p><img src="https://raw.githubusercontent.com/hablix/Lemur/master/grafiken/Folie4.PNG" alt="image"></p>
+<p>Wird ein maximum detektiert wird Je nachdem welchen winkel der Richtungsvektor Sensor für die drehung um die Y-Achse zur gleichen zeit liefert wird der dazugehörige ton gespielt.</p>
+<h2 id="sound">Sound</h2>
+<p>Für die Klang wird mangels vorhandensein von Röhrenglocken und der schwierigkeit ein frei verwendbares audio file einer Tonleiter des besagten instruments zu finden auf klangschalen ausgewichen. Das verwendete audio file ist stereo und von der website freesound. https://freesound.org/people/mooncubedesign/sounds/347975/</p>
+<p>Die aufnahme der 12-Teiligen Tonleiter geht in halbtonschritten von C#³ bis C#⁴ und weist eine sehr gute qualität auf. Im Frequenzspektrum sind grund und obertöne gut zu erkennen. Es tritt fast kein rauschen auf, wie im Spektrum zu sehen ist.</p>
+<p><img src="https://raw.githubusercontent.com/hablix/Lemur/master/grafiken/Folie5.PNG" alt="image"></p>
+<p>Die Klangschale klingt für ca 12 sekunden, was hier für die App nicht besonders nicht hilfreich war. in audacity wurde das Audiosignal getrennt und die einzelne Töne herausgeschnitten in einzelnen foundfiles gepackt um diese separat abspielen zu können und die Hüllkurve der amplitude so moduliert, dass der ton nach 2,5 sek ausklingt ohne abrupt zu enden.</p>
+<p><img src="https://raw.githubusercontent.com/hablix/Lemur/master/grafiken/Folie6.PNG" alt="image"></p>
+<p>Da es durch die genauigkeit der Richtungsbestimmung durch den Sensor nicht sinnvoll möglich ist eine umdrehung von 360° in 12 Sektoren zu teilen können in dieser version leider nicht alle Töne der tonleiter untergebracht werden.
+Die verwendeten töne im aktuellen projekt sind c#³, d³, d#³, e³, f³, f#³, g³. 7 erwies sich als gerade noch praktikable umsetzung um gezielt einen gewünschten sektor zu treffen und zu spielen. Eine weitere unterteilung für mehr töne würde eventuell mit der unterscheidung ob ein anschlag nach ober oder unten geschiet unterschieden werden können, nicht jedoch durch weitere sektoren.</p>
+<h2 id="app-layout">App layout</h2>
+<p>Die Activity mit der Röhrenglocken Simulation ist in das Konstrukt der Basis app integriert. Das layout ist schlicht gehalten und zeigt je nach orientierung des Smartphones an welcher ton gespielt würde, wenn das gerät jetzt zum schlag angesetzt wird. Dabei hilft zusätzlich die farbliche unterstützung in verschiedenen orange tönen. Die Gradangabe ist basis für die unterteilung der Sektoren, jedoch nicht mit der ausrichtung nach Norden übereinstimmen. Das Diagramm im unteren bereich dient nur der information und zu debugging zwecken. es veranschaulicht die Beschleunigungskräfte die Auf das telefon im moment des anschlages reagieren. Mitunter können beschleunigungen von 3 bis 4 g gemessen werden.</p>
+<p><img src="https://raw.githubusercontent.com/hablix/Lemur/master/grafiken/Folie7.PNG" alt="image"></p>
+<h1 id="ausblick">Ausblick</h1>
+<p>Das rotationssymmetrische erweist sich mitunter als unpraktisch, da zum teil große drehbewegungen nötig sind um von einem zum andern Ton zu wechseln.</p>
+<p>in einer weiteren version könnten mehr Töne durch einführung einer virtuellen ebene geschaffen werden. z.B. anschlag nach oben, anschlag nach unten.</p>
+<h1 id="referenz">Referenz</h1>
+<p>Projektverzeichnis der Simulation auf Github, hier kann der Gesamte Quellcode eingesehen werden und auch reproduziert werden:</p>
+<p><a href="https://github.com/hablix/Lemur">https://github.com/hablix/Lemur</a></p>
+<h1 id="quellen">Quellen</h1>
+<p>Basis projekt welches die grundlage für die simulation ist auf Github: <a href="https://github.com/Roslund/Lemur">https://github.com/Roslund/Lemur</a></p>
+<p>verwendeter soundfile: <a href="https://freesound.org/people/mooncubedesign/sounds/347975/">https://freesound.org/people/mooncubedesign/sounds/347975/</a></p>
+<p>Entwicklerdoku Senroren: https://developer.android.com/guide/topics/sensors/sensors_motion</p>
+<p>Entwicklerdoku Kordinatensystem Sensoren: https://developer.android.com/guide/topics/sensors/sensors_overview.html#sensors-coords</p>
+<p>Entwicklingsumgebung Android studio: https://developer.android.com/studio</p>
+<p>Audio editor Audacity: https://www.audacityteam.org/</p>
+<h1 id="bildnachweis">Bildnachweis</h1>
+<p>Achsen smartphone: <a href="https://jp.mathworks.com/help/supportpkg/android/ref/gyroscope.html">https://jp.mathworks.com/help/supportpkg/android/ref/gyroscope.html</a></p>
+<p>Röhrenglocken: <a href="https://de.wikipedia.org/wiki/R%C3%B6hrenglocken#/media/Datei:Chimes_(IMSO_pp55).jpg">https://de.wikipedia.org/wiki/R%C3%B6hrenglocken#/media/Datei:Chimes_(IMSO_pp55).jpg</a></p>
+
+</body>
+</html>
